@@ -51,7 +51,11 @@
         "octobercms": {
             "type": "composer",
             "url": "https://gateway.octobercms.com",
-            "only": ["october/*", "*-plugin", "*-theme"]
+            "only": [
+                "october/*",
+                "*-plugin",
+                "*-theme"
+            ]
         }
     }
 }
