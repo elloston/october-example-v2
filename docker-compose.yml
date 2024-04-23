@@ -1,0 +1,57 @@
+# docker-compose.yml
+services:
+    nginx:
+        container_name: october_example_nginx
+        image: nginx
+        ports:
+            - 80:80
+        volumes:
+            - ./:/var/www/html
+            - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf
+            - ./docker/nginx/sites:/etc/nginx/sites-enabled
+        depends_on:
+            - php
+
+    php:
+        container_name: ${APP_DOCKER_CONTAINER}
+        build: docker/php/
+        depends_on:
+            - postgres
+            - redis
+        volumes:
+            - ./:/var/www/html
+
+    postgres:
+        container_name: october_example_postgres
+        image: postgres
+        ports:
+            - ${DB_PORT:-5432}:5432
+        environment:
+            - POSTGRES_DB=${DB_DATABASE}
+            - POSTGRES_USER=${DB_USERNAME}
+            - POSTGRES_PASSWORD=${DB_PASSWORD}
+        volumes:
+            - dbdata:/var/lib/postgresql/data
+
+    redis:
+        container_name: october_example_redis
+        image: "redis"
+        ports:
+            - ${REDIS_PORT:-6379}:6379
+
+    pgadmin:
+        container_name: october_example_pgadmin
+        image: dpage/pgadmin4
+        ports:
+            - "${PGADMIN_PORT:-5555}:80"
+        environment:
+            - PGADMIN_DEFAULT_EMAIL=${PGADMIN_DEFAULT_EMAIL}
+            - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_DEFAULT_PASSWORD}
+        depends_on:
+            - postgres
+        volumes:
+            - ./servers.json:/pgadmin4/servers.json
+
+volumes:
+    dbdata:
+        driver: local
